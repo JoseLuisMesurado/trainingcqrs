@@ -1,0 +1,133 @@
+version: '3.8'
+networks:
+  dockerapi-dev:
+    driver: bridge
+services:
+  training.mssqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: training-sqlserver
+    restart: always
+    networks:
+     - dockerapi-dev
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Testeo123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - my-volume:/var/opt/mssql      
+        
+  training.initializaction:
+    image: traininginitialization:latest
+    depends_on:
+      - training.mssqlserver
+    build:
+      context: .
+      dockerfile: ./src/Training.Initialization/Dockerfile
+    networks:
+     - dockerapi-dev       
+    
+  training.api:
+    image: trainingapi:latest
+    depends_on:
+      - training.mssqlserver
+      - training.initializaction
+    ports:
+      - "8081:80"
+    networks:
+     - dockerapi-dev
+    environment:
+    - ASPNETCORE_ENVIRONMENT=dockerdev
+    build:
+      context: .
+      dockerfile: ./src/Training.Api/Dockerfile
+
+  # reactapp:
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: ./src/Training.ReactApp/
+  #   container_name: reactapp
+  #   depends_on:
+  #     - training.mssqlserver
+  #     - training.api
+  #   ports:
+  #     - 3000:3000
+  #   stdin_open: true
+  #   volumes:
+  #     - './:/reactapp'
+  #     - '/reactapp/node_modules'
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    depends_on:
+      - training.api
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    networks:
+     - dockerapi-dev
+
+  kafka-broker-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-broker-1
+    depends_on:
+      - zookeeper
+      - training.api
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://kafka-broker-1:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    ports:
+      - "29092:29092"
+    networks:
+      - dockerapi-dev
+  # elasticsearch:
+  #   container_name: es01
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+  #   # 8.x
+  #   environment: ['ES_JAVA_OPTS=-Xms2g -Xmx2g','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false']
+    
+  #   # 7.17.X
+  #   # environment: ['ES_JAVA_OPTS=-Xms2g -Xmx2g','bootstrap.memory_lock=true','discovery.type=single-node']
+  #   ports:
+  #     - 9200:9200
+  #   networks:
+  #     - dockerapi-dev
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #     nofile:
+  #       soft: 65536
+  #       hard: 65536
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.9.0
+  #   container_name: kib01
+  #   environment:
+  #     XPACK_APM_SERVICEMAPENABLED: "true"
+  #     XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+  #     LOGGING_ROOT_LEVEL: error
+  #   ports:
+  #     - 5601:5601
+  #   networks:
+  #     - dockerapi-dev
+volumes:
+  my-volume:      
+
+  
+
+
+    
+
+
+

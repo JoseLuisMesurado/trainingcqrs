@@ -1,0 +1,1 @@
+export const BACKEND_DEVELOPMENT_URL = 'http://localhost:8081/api';

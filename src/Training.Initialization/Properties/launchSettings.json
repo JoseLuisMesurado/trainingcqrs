@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Training.Initialization": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
