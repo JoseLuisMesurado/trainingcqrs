@@ -11,9 +11,10 @@ public class Employee<T> : AuditableEntity, IEntityPK<T>
     //Keys
     public T Id { get; set; }
 
-    public string EmployeeFirstName { get; set; }
-    public string EmployeeLastName { get; set; }
-    public DateTime DateOfBirth {get; set;}
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public DateTime BirthDate {get; set;}
 
     //Navigations
     public ICollection<Permission<Guid>> Permissions { get; set; }

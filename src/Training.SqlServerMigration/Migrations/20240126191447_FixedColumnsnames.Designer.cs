@@ -12,8 +12,8 @@ using Training.Infra.Contexts;
 namespace Training.SqlServerMigration.Migrations
 {
     [DbContext(typeof(TrainigContext))]
-    [Migration("20240126002419_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20240126191447_FixedColumnsnames")]
+    partial class FixedColumnsnames
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,13 +31,13 @@ namespace Training.SqlServerMigration.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
@@ -46,12 +46,15 @@ namespace Training.SqlServerMigration.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EmployeeFirstName")
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("EmployeeLastName")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -88,10 +91,10 @@ namespace Training.SqlServerMigration.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("GrantedDate")
+                    b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("GrantedExpirationDate")
+                    b.Property<DateTime>("GrantedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<short>("PermissionTypeId")

@@ -8,7 +8,7 @@ namespace Training.Application.Permissions.Commands
         {
             RuleFor(v => v.PermissionTypeId).NotNull().NotEmpty();
             RuleFor(v => v.EmployeeId).NotNull().NotEmpty();
-            RuleFor(v=>v.GrantedExpirationDate).NotNull().NotEmpty();
+            RuleFor(v => v.ExpirationDate).NotNull().NotEmpty();
         }
     }
 }

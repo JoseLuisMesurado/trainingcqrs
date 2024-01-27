@@ -1,15 +1,15 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
-using Training.API.Exceptions;
+using Training.NG.HttpResponse;
 
 namespace Training.API.Behaviors
 {
-    public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-        public ValidationBehaviour(IEnumerable<IValidator<TRequest>> validators)
+        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
         {
             _validators = validators;
         }

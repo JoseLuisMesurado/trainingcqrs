@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using Training.Application.Permissions.Commands;
+using Training.Core;
 using Training.Core.Entities;
 using Training.Core.SqlRepositories;
 using Training.XUnitTest.Mocks;
@@ -10,6 +11,7 @@ namespace Training.XUnitTest.CommandsTest
     public class AddPermissionCommandTest
     {
         private readonly Mock<IPermissionRepository> _permissionRepositoryMock = new();
+        private readonly Mock<IPermissionElasticRepository> _permissionElasticRepository = new();
 
         [Fact]
         public async Task AddPermissionTest()
@@ -25,7 +27,7 @@ namespace Training.XUnitTest.CommandsTest
                 .ReturnsAsync(MockRepositories.PermissionGetById());
 
 
-           var handler = new AddPermissionCommandHandler(_permissionRepositoryMock.Object);
+           var handler = new AddPermissionCommandHandler(_permissionRepositoryMock.Object, _permissionElasticRepository.Object);
            await handler.Handle(new AddPermissionCommand
            {
                PermissionTypeId = 3,

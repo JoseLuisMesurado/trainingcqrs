@@ -13,7 +13,7 @@ namespace Training.XUnitTest.Mocks
                     PermissionTypeId = 1,
                     EmployeeId = new Guid(),
                     GrantedDate = DateTime.UtcNow.Date,
-                    GrantedExpirationDate = DateTime.UtcNow.AddDays(3),
+                    ExpirationDate = DateTime.UtcNow.AddDays(3),
                     PermissionType =  new PermissionType<short>{
                                         Id= 1,
                                         Name="Admin"
@@ -23,7 +23,7 @@ namespace Training.XUnitTest.Mocks
                     PermissionTypeId = 2,
                     EmployeeId = new Guid(),
                     GrantedDate = DateTime.UtcNow.Date,
-                    GrantedExpirationDate = DateTime.UtcNow.AddDays(3),
+                    ExpirationDate = DateTime.UtcNow.AddDays(3),
                     PermissionType =  new PermissionType<short>{
                                         Id= 2,
                                         Name="Root"
@@ -34,7 +34,7 @@ namespace Training.XUnitTest.Mocks
                     PermissionTypeId = 3,
                     EmployeeId = new Guid(),
                     GrantedDate = DateTime.UtcNow.Date,
-                    GrantedExpirationDate = DateTime.UtcNow.AddDays(3),
+                    ExpirationDate = DateTime.UtcNow.AddDays(3),
                     PermissionType =  new PermissionType<short>{
                                         Id= 3,
                                         Name="Permision 1"
@@ -53,7 +53,7 @@ namespace Training.XUnitTest.Mocks
                 EmployeeId = new Guid(),
                 PermissionTypeId = 3,
                 GrantedDate = DateTime.UtcNow.Date,
-                GrantedExpirationDate = DateTime.UtcNow.AddDays(3),
+                ExpirationDate = DateTime.UtcNow.AddDays(3),
                 PermissionType = new PermissionType<short>
                 {
                     Id = 3,

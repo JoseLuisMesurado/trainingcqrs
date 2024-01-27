@@ -1,4 +1,4 @@
-﻿namespace Training.API.Exceptions
+﻿namespace Training.NG.HttpResponse
 {
     public class InternalErrorException : Exception
     {

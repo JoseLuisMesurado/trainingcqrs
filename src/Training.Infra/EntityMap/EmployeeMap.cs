@@ -17,9 +17,9 @@ internal class EmployeeMap : IEntityTypeConfiguration<Employee<Guid>>
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
         //Properties
-        builder.Property(x => x.EmployeeFirstName).HasMaxLength(50).IsRequired();
-        builder.Property(x => x.EmployeeLastName).HasMaxLength(50).IsRequired();
-        builder.Property(x=>x.DateOfBirth).IsRequired();
+        builder.Property(x => x.FirstName).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.LastName).HasMaxLength(50).IsRequired();
+        builder.Property(x=>x.BirthDate).IsRequired();
 
         //Navegation One to Many
         builder.HasMany<Permission<Guid>>(e=>e.Permissions).WithOne(c=>c.Employee).HasForeignKey( e=>e.EmployeeId).IsRequired();

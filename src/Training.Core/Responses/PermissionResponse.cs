@@ -8,10 +8,8 @@ namespace Training.Core.Responses
         public Guid Id { get; set; }
         public Guid EmployeeId { get; set; }
         public int PermissionTypeId { get; set; }
-        public string EmployeeFirstName { get; set; }
-        public string EmployeeLastName { get; set; }
         public DateTime GrantedDate { get; set; }
-        public DateTime GrantedExpirationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
         public string PermissionType { get; set; }
     }
 
@@ -23,7 +21,7 @@ namespace Training.Core.Responses
             PermissionTypeId = p.PermissionTypeId,
             EmployeeId = p.EmployeeId,
             GrantedDate = p.GrantedDate,
-            GrantedExpirationDate = p.GrantedExpirationDate,
+            ExpirationDate = p.ExpirationDate,
             PermissionType = p.PermissionType.Name
         };
 

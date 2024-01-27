@@ -7,6 +7,12 @@ using Training.NG.EFCommon;
 using Training.NG.KafkaHelper;
 using Training.Core;
 using Training.Infra;
+using Training.NG.ElasticSearchHelper;
+using Elasticsearch.Net;
+using Nest;
+using Nest.JsonNetSerializer;
+using Training.Core.Entities;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -60,6 +66,46 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IPermissionTypeRepository ,PermissionTypeRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             return services;
+        }
+
+        public static IServiceCollection AddElasticSearch(this IServiceCollection services, ElasticSearchConfig elasticSearchConfig)
+        {
+            var pool = new SingleNodeConnectionPool(new Uri(elasticSearchConfig.Url));
+
+            var settings= new ConnectionSettings(pool,(builtInSerializer, connectionSettings) =>
+                new JsonNetSerializer(builtInSerializer, connectionSettings, () => new Newtonsoft.Json.JsonSerializerSettings{
+                    ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                }))
+                .DefaultFieldNameInferrer(p=>p)
+                .PrettyJson();
+
+            AddDefaultMapping(settings);
+
+            var client = new ElasticClient(settings);
+            services.AddSingleton<IElasticClient>(client);
+            CreateIndex(client, elasticSearchConfig.DefaultIndex);
+            services.AddElasticSearchIndexRepositories();
+            return services;
+        }
+
+        public static IServiceCollection AddElasticSearchIndexRepositories(this IServiceCollection services){
+
+            services.TryAddSingleton<IPermissionElasticRepository>(sp=>{
+                var client = sp.GetRequiredService<IElasticClient>();
+                return new PermissionElasticRepository(client,"training-index");
+            });
+            return services;
+        }
+        private static void CreateIndex(ElasticClient client, string defaultIndex)
+        {
+            client.Indices.Create(defaultIndex, index =>
+                index.Map<Permission<Guid>>(m=>m.AutoMap())
+            );
+        }
+
+        private static void AddDefaultMapping(ConnectionSettings settings)
+        {
+            settings.DefaultMappingFor<Permission<Guid>>(m=>m).PrettyJson(false);
         }
     }
 }

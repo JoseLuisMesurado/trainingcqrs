@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Training.Infra.Contexts;
 
@@ -11,9 +12,11 @@ using Training.Infra.Contexts;
 namespace Training.SqlServerMigration.Migrations
 {
     [DbContext(typeof(TrainigContext))]
-    partial class TrainigContextModelSnapshot : ModelSnapshot
+    [Migration("20240126183056_FirstMigration")]
+    partial class FirstMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,10 +91,10 @@ namespace Training.SqlServerMigration.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ExpirationDate")
+                    b.Property<DateTime>("GrantedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("GrantedDate")
+                    b.Property<DateTime>("GrantedExpirationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<short>("PermissionTypeId")

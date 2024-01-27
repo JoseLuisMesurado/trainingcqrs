@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Serilog;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Training.API.Behaviors;
-using Training.API.Exceptions;
 using Training.API.ProblemDetailsConfig;
+using Training.NG.HttpResponse;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -60,7 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection FluentValidationsModelsConfiguration(this IServiceCollection services, Assembly assembly)
         {
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssembly(assembly);
             return services;
         }
@@ -71,24 +72,42 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 setup.Map(delegate (HttpContext ctx, ModelValidationException ex)
                 {
-                    DefaultInterpolatedStringHandler defaultInterpolatedStringHandler2 = new(19, 2);
-                    defaultInterpolatedStringHandler2.AppendLiteral("EndPoint: ");
-                    defaultInterpolatedStringHandler2.AppendFormatted(ctx.Request.Path);
-                    defaultInterpolatedStringHandler2.AppendLiteral(" . Error:");
-                    defaultInterpolatedStringHandler2.AppendFormatted(ex.Message);
+                    DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new(19, 2);
+                    defaultInterpolatedStringHandler.AppendLiteral("EndPoint: ");
+                    defaultInterpolatedStringHandler.AppendFormatted(ctx.Request.Path);
+                    defaultInterpolatedStringHandler.AppendLiteral(" . Error:");
+                    defaultInterpolatedStringHandler.AppendFormatted(ex.Message);
                     
                     return new AppProblemDetails
                     {
                         Type = ex.Type,
                         Title = ex.Title,
                         Detail = ex.Detail,
-                        Status = ex.Status,
+                        Status = StatusCodes.Status400BadRequest,
                         Instance = (string)ctx.Request.Path,
                         ErrorsMessages = ex.ErrorsMessages
                     };
+
                 });
                 setup.Map(delegate (HttpContext ctx, InternalErrorException ex)
                 {
+                    DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new(19, 2);
+                    defaultInterpolatedStringHandler.AppendLiteral("EndPoint: ");
+                    defaultInterpolatedStringHandler.AppendFormatted(ctx.Request.Path);
+                    defaultInterpolatedStringHandler.AppendLiteral(" . Error:");
+                    defaultInterpolatedStringHandler.AppendFormatted(ex.Message);
+                    var toReturn =new ProblemDetails
+                    {
+                        Title = ex.Title,
+                        Status = ex.Status,
+                        Type = ex.Type,
+                        Instance = ex.Instance,
+                        Detail = ex.Message,
+                    };
+                    return toReturn;
+                });
+                setup.Map(delegate (HttpContext ctx, NotFoundEntityException ex){
+
                     DefaultInterpolatedStringHandler defaultInterpolatedStringHandler = new(19, 2);
                     defaultInterpolatedStringHandler.AppendLiteral("EndPoint: ");
                     defaultInterpolatedStringHandler.AppendFormatted(ctx.Request.Path);
@@ -98,12 +117,13 @@ namespace Microsoft.Extensions.DependencyInjection
                     return new ProblemDetails
                     {
                         Title = ex.Title,
-                        Status = ex.Status,
+                        Status = StatusCodes.Status404NotFound,
                         Type = ex.Type,
-                        Instance = ex.Instance,
-                        Detail = ex.Message
+                        Instance = (string)ctx.Request.Path,
+                        Detail =  ex.Detail
                     };
                 });
+
             });
             return services;
         }
@@ -111,11 +131,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             // Configure the HTTP request pipeline.
             app.UseProblemDetails();
-            if (app.Environment.IsDevelopment())
-            {
+            // if (app.Environment.IsDevelopment())
+            // {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            //}
+            app.UseSerilogRequestLogging();
             app.UseCors("AllowAll");
             //app.UseHttpsRedirection();
             app.UseAuthorization();

@@ -13,7 +13,7 @@ namespace Training.Core.Entities
 
         //properties
         public DateTime GrantedDate { get; set; }
-        public DateTime GrantedExpirationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
 
         //Navigations
         public virtual PermissionType<short> PermissionType { get; set; }

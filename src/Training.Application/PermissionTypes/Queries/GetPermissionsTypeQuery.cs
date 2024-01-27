@@ -3,22 +3,21 @@ using System.Linq.Expressions;
 using Training.Core.Entities;
 using Training.Core.Responses;
 using Training.Core.SqlRepositories;
-using Training.NG.HttpResponse;
 
 namespace Training.Application.PermissionTypes.Queries
 {
-    public record GetPermissionTypeQuery : IRequest<ApiResponse<ICollection<PermissionTypeResponse>>>;
+    public record GetPermissionTypesQuery : IRequest<ICollection<PermissionTypeResponse>>;
 
-    public class GetPermissionTypeQueryHandler : IRequestHandler<GetPermissionTypeQuery, ApiResponse<ICollection<PermissionTypeResponse>>>
+    public class GetPermissionTypeQueryHandler : IRequestHandler<GetPermissionTypesQuery, ICollection<PermissionTypeResponse>>
     {
         private readonly IPermissionTypeRepository _permissionTypeRepository;
         public GetPermissionTypeQueryHandler(IPermissionTypeRepository permissionTypeRepository) => _permissionTypeRepository = permissionTypeRepository;
 
-        public async Task<ApiResponse<ICollection<PermissionTypeResponse>>> Handle(GetPermissionTypeQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<PermissionTypeResponse>> Handle(GetPermissionTypesQuery request, CancellationToken cancellationToken)
         {
             var permimissioTypeList = await _permissionTypeRepository.GetAll<PermissionTypeResponse>(GetPermissionTypeSelect);
 
-            return new ApiResponse<ICollection<PermissionTypeResponse>> { Response = permimissioTypeList };
+            return  permimissioTypeList;
         }
 
         private static readonly Expression<Func<PermissionType<short>, PermissionTypeResponse>> GetPermissionTypeSelect = p => new PermissionTypeResponse
